@@ -12,6 +12,7 @@ from munch import munchify
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
+from tqdm import tqdm 
 
 # pylint: disable=no-member,not-callable
 
@@ -357,7 +358,8 @@ class Training:
         print("Training: %s" % split_name)
         iterating = True
         epoch = 1
-        while iterating is True and (epoch < self.args.epochs + 1):
+        for epoch in tqdm(range(1, self.args.epochs + 1)): 
+            if not iterating: break 
             self.model.train()
             epoch_start = time.time()
             for batch in self.train_loader:
