@@ -79,6 +79,8 @@ def plot_weighted_theta(
     sample=True,
     nsamples=100,
 ):
+    TR_iws, TR_theta, TR_device_ids, VL_iws, VL_theta, VL_device_ids = \
+            torch_to_numpy(TR_iws, TR_theta, TR_device_ids, VL_iws, VL_theta, VL_device_ids) 
     # make a dataframe so we can call seaborn scatter plot
     order_ids = np.argsort(theta_names)
 
@@ -147,6 +149,9 @@ def species_summary(
     species_names, treatments, device_ids, times, iw_states, devices, settings, normalise=True,
 ):
     """Plot the simulated latent species"""
+    species_names, treatments, device_ids, times, iw_states, devices, settings = \
+            torch_to_numpy(species_names, treatments, device_ids, times, 
+                    iw_states, devices, settings) 
     ndevices = len(devices)
     nplots = iw_states.shape[1]
     fs = 14
@@ -208,7 +213,7 @@ def xval_treatments(res, devices):
     """Compare the final simulated points against the equivalent data-points to establish functional response"""
     nplots = len(res.settings.signals)
     ndev = len(devices)
-
+    res = torch_to_numpy(res) 
     ms = 5
     fs = 14
     obs_mk = "x"
@@ -272,6 +277,7 @@ def xval_treatments(res, devices):
 
 def xval_fit_summary(res, device_id, separatedInputs=False):
     """Summary plot of model-data fit for cross-validation results"""
+    res, device_id = torch_to_numpy(res, device_id) 
     nplots = len(res.settings.signals)
     fs = 14
 
@@ -327,6 +333,7 @@ def xval_fit_summary(res, device_id, separatedInputs=False):
 
 
 def gen_treatment_str(conditions, treatments, unit=None):
+    conditions, treatments = torch_to_numpy(conditions, treatments) 
     vstr_list = []
     for k, v in zip(conditions, treatments):
         val = np.exp(v) - 1.0
@@ -341,6 +348,7 @@ def gen_treatment_str(conditions, treatments, unit=None):
 
 
 def xval_individual(res, device_id):
+    res = torch_to_numpy(res) 
     nplots = res.X_obs.shape[1]
     colors = ["tab:gray", "r", "y", "c"]
     maxs = np.max(res.X_obs, axis=(0, 2))
@@ -401,6 +409,7 @@ def xval_individual(res, device_id):
 
 def xval_individual_2treatments(res, device_id):
     """Multi-panel plot for each sample, with treatments separated into 2 groups"""
+    res = torch_to_numpy(res) 
     nplots = res.X_obs.shape[1]
     colors = ["tab:gray", "r", "y", "c"]
     maxs = np.max(res.X_obs, axis=(0, 2))
