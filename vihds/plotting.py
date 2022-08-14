@@ -12,12 +12,26 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from vihds import utils  # noqa: E402
 
+def _torch_to_numpy(*tensors): 
+    """ 
+    Convert properly a Torch's tensor to numpy, checking if it 
+    is in GPU (matplotlib should verify this, by the way). 
+    """ 
+    for tensor in tensors: 
+        if torch.is_tensor(tensor): 
+            yield tensor.cpu().nump()  
+        else: 
+            yield tensor 
+
+def torch_to_numpy(*tensors): 
+    return list(_torch_to_numpy(tensors)) 
 
 def plot_prediction_summary(
     device_names, signal_names, times, OBS, MU, STD, device_ids, predict_style, fixYaxis=False,
 ):
     """Compare the simulation against the data for the highest weighted sample"""
-
+    signal_names, times, OBS, MU, STD, predict_style = torch_to_numpy(
+            signal_names, times, OBS, MU, STD, predict_style) 
     nplots = MU.shape[1]
     unique_devices = np.unique(device_ids)
     ndevices = len(unique_devices)
