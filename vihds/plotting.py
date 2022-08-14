@@ -11,7 +11,17 @@ from matplotlib import cm  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from vihds import utils  # noqa: E402
+import torch 
 
+def _getattr(self, attr): 
+    """ 
+    A wrapper for the __getattr__ method; it checks whether the 
+    attribute is a tensor and is in the GPU. 
+    """ 
+    val = getattr(self, attr) 
+    if torch.is_tensor(val): 
+        return val.cpu() 
+    return val 
 def _torch_to_numpy(*tensors): 
     """ 
     Convert properly a Torch's tensor to numpy, checking if it 
@@ -19,12 +29,14 @@ def _torch_to_numpy(*tensors):
     """ 
     for tensor in tensors: 
         if torch.is_tensor(tensor): 
-            yield tensor.cpu().nump()  
+            yield tensor.cpu().numpy()  
         else: 
             yield tensor 
 
 def torch_to_numpy(*tensors): 
-    return list(_torch_to_numpy(tensors)) 
+    arrays = [arr for arr in _torch_to_numpy(*tensors)] 
+    if len(arrays) == 1: return arrays[-1] 
+    return arrays 
 
 def plot_prediction_summary(
     device_names, signal_names, times, OBS, MU, STD, device_ids, predict_style, fixYaxis=False,
@@ -307,6 +319,7 @@ def xval_fit_summary(res, device_id, separatedInputs=False):
             w_mu = res.iw_predict_mu[locs, idx, :]
             w_std = res.iw_predict_std[locs, idx, :]
             ax.set_prop_cycle("color", colors)
+            res.times = res.times.cpu() 
             for mu, std in zip(w_mu, w_std):
                 ax.fill_between(res.times, mu - 2 * std, mu + 2 * std, alpha=0.1)
             ax.plot(res.times, res.X_obs[locs, idx, :].T, ".", alpha=1, markersize=2)

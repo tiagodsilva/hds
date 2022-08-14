@@ -7,7 +7,6 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 from vihds import plotting
 
-
 class XvalMerge(object):
     def __init__(self, args, settings):
         self.epoch = args.epochs
@@ -91,11 +90,11 @@ class XvalMerge(object):
         self.iw_predict_std = np.sqrt(np.sum(importance_weights * (self.X_predict**2 + 1.0 / self.precisions), 1)
                                       - self.iw_predict_mu**2)
         self.iw_states = np.sum(importance_weights * self.X_states, 1)
-
+    
     def save(self):
         location = self.trainer.tb_log_dir
         print("Saving results to %s" % location)
-
+        
         def save(base, data):
             np.save(os.path.join(location, base + ".npy"), data)
 
@@ -103,7 +102,7 @@ class XvalMerge(object):
             np.savetxt(
                 os.path.join(location, base + ".txt"), np.array(data, dtype=str), delimiter=" ", fmt="%s",
             )
-
+    
         print("Saving to: %s" % location)
         save("xval_elbo", self.elbo)
         save("xval_elbo_list", self.elbo_list)
@@ -127,7 +126,7 @@ class XvalMerge(object):
         save("xval_chunk_sizes", self.chunk_sizes)
         save("xval_ids", self.ids)
         savetxt("xval_names", self.species_names)
-        save("xval_times", self.times)
+        save("xval_times", self.times.cpu())
 
     def load(self, location=None):
         if location is None:
@@ -251,3 +250,4 @@ class XvalMerge(object):
             self.save_figs(f_indiv_i, "xval_individual_%s" % device)
             self.xval_writer.add_figure("Device_Individual/" + device, f_indiv_i, self.epoch)
         self.xval_writer.flush()
+
