@@ -1,4 +1,4 @@
-name: vi-hds
+name: vihds
 channels:
   - defaults
   - conda-forge 
