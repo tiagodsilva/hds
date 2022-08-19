@@ -30,3 +30,7 @@ env
 results
 # notebooks
 test.cmd
+
+notebooks/hds
+notebooks/results
+notebooks/data
