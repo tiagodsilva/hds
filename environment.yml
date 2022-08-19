@@ -1,8 +1,10 @@
 name: vi-hds
 channels:
   - defaults
+  - conda-forge 
 dependencies:
   - python==3.8.3
   - pip==20.1.1
+  - jupyterlab
   - pip:
     - -r requirements.txt
