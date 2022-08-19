@@ -1,8 +1,0 @@
-OD
-RFP
-YFP
-CFP
-F530
-F480
-LuxR
-LasR
